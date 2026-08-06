@@ -75,7 +75,7 @@ def create_archive(output_path: Path) -> None:
             cwd=PROJECT_ROOT,
             text=True,
         )
-        archive.writestr(Path(root_name) / "git_log.txt", git_log)
+        archive.writestr(str(Path(root_name) / "git_log.txt"), git_log)
 
 
 def main() -> None:
