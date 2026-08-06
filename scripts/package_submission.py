@@ -12,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REPORTS_DIR = PROJECT_ROOT / "reports"
 OUTPUT_DIR = PROJECT_ROOT / "data" / "output"
 EXCLUDED_NAMES = {
+    ".git",
     ".venv",
     "__pycache__",
     ".pytest_cache",
@@ -19,6 +20,7 @@ EXCLUDED_NAMES = {
     ".DS_Store",
     "git_log.txt",
     "image.png",
+    "reports",
 }
 EXCLUDED_SUFFIXES = {".docx", ".pages", ".pyc", ".pyo", ".zip"}
 
@@ -64,12 +66,14 @@ def verify_required_files() -> None:
 
 def create_archive(output_path: Path) -> None:
     """프로젝트 최상위 폴더를 포함하여 ZIP 파일을 생성합니다."""
-    root_name = PROJECT_ROOT.name
+    root_name = "practice3"
+    report_pdf = find_report_pdf()
     with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(PROJECT_ROOT.rglob("*")):
             if path.is_dir() or should_exclude(path):
                 continue
             archive.write(path, Path(root_name) / path.relative_to(PROJECT_ROOT))
+        archive.write(report_pdf, Path(root_name) / report_pdf.name)
         git_log = subprocess.check_output(
             ["git", "log", "--oneline"],
             cwd=PROJECT_ROOT,

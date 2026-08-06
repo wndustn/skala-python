@@ -1,35 +1,36 @@
-# Day 1 데이터 수집 미니 파이프라인
+# Practice 3: 비동기 API 데이터 수집 파이프라인
 
-## 과제가 요구하는 것
+Open-Meteo, Countries.dev, ip-api에서 데이터를 동시에 수집하고,
+Pydantic v2로 검증한 뒤 CSV와 Parquet 형식으로 저장하는 실습입니다.
 
-1. Open-Meteo, countries.dev, ip-api를 `asyncio.gather()`로 동시에 호출합니다.
-2. 응답 JSON의 필요한 필드를 Pydantic v2 엄격 모드로 검증합니다.
-3. 검증된 데이터를 시간대별 한 행으로 결합합니다.
-4. 같은 데이터를 CSV와 Parquet로 저장하고 읽기·쓰기 시간과 크기를 비교합니다.
-5. pytest와 Ruff로 동작 및 코드 스타일을 확인합니다.
-
-세 API는 공개 API이므로 별도 API 키가 필요 없습니다.
-
-## 실행 순서 (macOS)
+## 환경 설정
 
 ```bash
-python3.13 -m venv .venv
+cd practice3
+python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+```
+
+## 프로그램 실행
+
+```bash
 python -m app.main
+```
+
+정상 실행되면 세 API의 수집과 검증 결과가 출력됩니다. 검증된 서울 3일치
+날씨 데이터 72건은 CSV와 Parquet로 저장되며, 두 파일의 읽기·쓰기 시간과
+파일 크기도 함께 확인할 수 있습니다.
+
+결과 파일은 `data/output` 폴더에 생성됩니다.
+
+## 테스트 및 코드 검사
+
+```bash
 pytest -v
 ruff check .
 ```
 
-Python 3.13이 없다면 설치된 Python으로 가상환경을 만들어도 코드 실행은 가능하지만,
-제출 화면에는 교수님 권장 버전인 3.13을 사용하는 편이 안전합니다.
-
-## 생성되는 결과
-
-- `data/output/seoul_context.csv`
-- `data/output/seoul_context.parquet`
-- `data/output/performance_result.json`
-- 검증 실패 시 `data/output/validation_errors.json`
-
-`ip-api` 결과가 미국으로 나오는 이유는 내 위치를 조회하는 것이 아니라 과제에 지정된
-Google DNS IP `8.8.8.8`의 위치를 조회하기 때문입니다.
+CSV는 내용을 바로 확인하기 편하고, Parquet는 자료형을 유지하면서 데이터를
+저장할 수 있습니다. 실행 환경에 따라 측정 시간이 달라질 수 있으므로 프로그램을
+직접 실행한 결과를 기준으로 비교했습니다.
