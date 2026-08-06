@@ -1,6 +1,6 @@
 """수집한 JSON을 검증하고 저장 가능한 행으로 결합합니다."""
 
-from typing import Any
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
@@ -11,8 +11,10 @@ from app.models import (
     WeatherResponse,
 )
 
+ModelT = TypeVar("ModelT", bound=BaseModel)
 
-def validate_one[ModelT: BaseModel](
+
+def validate_one(
     model_class: type[ModelT],
     row: dict[str, Any],
     source_name: str,
