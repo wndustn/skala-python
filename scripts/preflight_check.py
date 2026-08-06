@@ -26,6 +26,15 @@ def check_outputs() -> None:
             raise RuntimeError(f"필수 결과 파일 누락: {path.name}")
     if len(pd.read_csv(csv_path)) != len(pd.read_parquet(parquet_path)):
         raise RuntimeError("CSV와 Parquet 행 수가 다릅니다.")
+    performance = pd.read_json(performance_path, typ="series")
+    required_metrics = {
+        "csv_seconds",
+        "parquet_seconds",
+        "csv_read_seconds",
+        "parquet_read_seconds",
+    }
+    if not required_metrics.issubset(performance.index):
+        raise RuntimeError("CSV·Parquet 읽기/쓰기 시간 측정값이 누락됐습니다.")
 
 
 def main() -> None:
@@ -43,4 +52,3 @@ if __name__ == "__main__":
     except (OSError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f"[FAIL] {exc}")
         raise SystemExit(1) from exc
-

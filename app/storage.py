@@ -51,10 +51,18 @@ def save_with_performance(
     return performance
 
 
-def verify_saved_data(csv_path: Path, parquet_path: Path) -> tuple[int, int]:
-    """두 파일을 다시 읽어 행 수와 시간 값이 같은지 확인합니다."""
+def verify_saved_data(
+    csv_path: Path,
+    parquet_path: Path,
+) -> tuple[int, int, float, float]:
+    """두 파일의 읽기 시간을 측정하고 내용이 같은지 확인합니다."""
+    csv_start = perf_counter()
     csv_data = pd.read_csv(csv_path)
+    csv_read_seconds = perf_counter() - csv_start
+
+    parquet_start = perf_counter()
     parquet_data = pd.read_parquet(parquet_path, engine="pyarrow")
+    parquet_read_seconds = perf_counter() - parquet_start
 
     if len(csv_data) != len(parquet_data):
         raise ValueError("CSV와 Parquet의 행 수가 다릅니다.")
@@ -62,5 +70,9 @@ def verify_saved_data(csv_path: Path, parquet_path: Path) -> tuple[int, int]:
         "forecast_time"
     ].tolist():
         raise ValueError("CSV와 Parquet의 시간 데이터가 다릅니다.")
-    return len(csv_data), len(parquet_data)
-
+    return (
+        len(csv_data),
+        len(parquet_data),
+        round(csv_read_seconds, 6),
+        round(parquet_read_seconds, 6),
+    )

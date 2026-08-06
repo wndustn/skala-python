@@ -50,8 +50,15 @@ async def run_pipeline() -> None:
     )
 
     print("\n=== 5. 저장 결과 재검증 ===")
-    csv_rows, parquet_rows = verify_saved_data(CSV_OUTPUT, PARQUET_OUTPUT)
+    csv_rows, parquet_rows, csv_read_seconds, parquet_read_seconds = (
+        verify_saved_data(CSV_OUTPUT, PARQUET_OUTPUT)
+    )
+    performance["csv_read_seconds"] = csv_read_seconds
+    performance["parquet_read_seconds"] = parquet_read_seconds
+    save_json(performance, PERFORMANCE_OUTPUT)
     print(f"재로딩 완료: CSV={csv_rows}건, Parquet={parquet_rows}건")
+    print(f"CSV 읽기 시간: {csv_read_seconds}초")
+    print(f"Parquet 읽기 시간: {parquet_read_seconds}초")
     print("\n전체 파이프라인이 정상 완료되었습니다.")
 
 
@@ -72,4 +79,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

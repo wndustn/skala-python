@@ -31,9 +31,12 @@ def test_save_and_verify(tmp_path: Path) -> None:
     performance = save_with_performance(
         records, csv_path, parquet_path, performance_path
     )
-    csv_rows, parquet_rows = verify_saved_data(csv_path, parquet_path)
+    csv_rows, parquet_rows, csv_read_seconds, parquet_read_seconds = (
+        verify_saved_data(csv_path, parquet_path)
+    )
 
     assert performance["rows"] == 1
     assert csv_rows == parquet_rows == 1
+    assert csv_read_seconds >= 0
+    assert parquet_read_seconds >= 0
     assert performance_path.exists()
-
