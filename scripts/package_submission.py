@@ -17,8 +17,10 @@ EXCLUDED_NAMES = {
     ".pytest_cache",
     ".ruff_cache",
     ".DS_Store",
+    "git_log.txt",
+    "image.png",
 }
-EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".zip"}
+EXCLUDED_SUFFIXES = {".docx", ".pages", ".pyc", ".pyo", ".zip"}
 
 
 def should_exclude(path: Path) -> bool:
@@ -48,7 +50,6 @@ def verify_required_files() -> None:
     """결과 데이터, Git 이력, PDF 보고서 존재 여부를 확인합니다."""
     required_files = (
         PROJECT_ROOT / "requirements.txt",
-        PROJECT_ROOT / "git_log.txt",
         OUTPUT_DIR / "seoul_context.csv",
         OUTPUT_DIR / "seoul_context.parquet",
         OUTPUT_DIR / "performance_result.json",
@@ -69,6 +70,12 @@ def create_archive(output_path: Path) -> None:
             if path.is_dir() or should_exclude(path):
                 continue
             archive.write(path, Path(root_name) / path.relative_to(PROJECT_ROOT))
+        git_log = subprocess.check_output(
+            ["git", "log", "--oneline"],
+            cwd=PROJECT_ROOT,
+            text=True,
+        )
+        archive.writestr(Path(root_name) / "git_log.txt", git_log)
 
 
 def main() -> None:
